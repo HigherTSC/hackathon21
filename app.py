@@ -16,7 +16,7 @@ goalhandler.store_new_goal(
 	name="New Laptop",
 	amount_to_save=1000)
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')
 
 @app.route('/')
 def index():
@@ -25,10 +25,10 @@ def index():
 @app.route('/progress1')
 def progress1():
 	def generate():
+		current_goal = goalhandler.get_goal("Birthday Present")
 		x = 0
 		
-		#for x in range(0,100):
-		while x < 101:
+		while x < current_goal.amount_to_save:
 			yield "data:" + str(x) + "\n\n"
 			x = x + (4.35)
 			time.sleep(0.5)

@@ -43,28 +43,28 @@ class GoalHandler():
             message = f"{deposit} was added. You now have {current_goal.amount_to_save} left to save for your {name}."
         return message
 
-        def get_goal(self, name):
-            if name in self.goals.keys():
-                return self.goals[name]
-            else:
-                return ValueError
-        
-        def get_goal_streak(self, name):
-            if name in self.goals.keys():
-                return today - self.goals[name].start_date
-            else:
-                return ValueError
+    def get_goal(self, name):
+        if name in self.goals.keys():
+            return self.goals[name]
+        else:
+            return ValueError
+    
+    def get_goal_streak(self, name):
+        if name in self.goals.keys():
+            return today - self.goals[name].start_date
+        else:
+            return ValueError
 
-        def get_max_streak(self):
-            all_streak = []
-            for name in self.goals.keys():
-                all_streak.append(self.get_goal_streak(name))
-            return max(all_streak)
+    def get_max_streak(self):
+        all_streak = []
+        for name in self.goals.keys():
+            all_streak.append(self.get_goal_streak(name))
+        return max(all_streak)
 
-        def clean_list(self):
-            for name in self.goals.keys():
-                if self.goals[name].isComplete == True:
-                    self.goals.pop(name)
+    def clean_list(self):
+        for name in self.goals.keys():
+            if self.goals[name].isComplete == True:
+                self.goals.pop(name)
 
 
 class Goal():
