@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{% endblock %}
+{% block content %}
+<h2 style="width: 30%; margin: 50px;">SAVINGS GOALS/INPUT</h2>
+<form>
+    <div class="mb-3" style="width: 30%; margin: 50px;">
+      <label for="itemName" class="form-label">Item To Save For</label>
+      <input type="text" class="form-control" id="itemName">
+      <div id="nameHelp" class="form-text">What do you want to save up for?</div>
+    </div>
+    <div class="mb-3" style="width: 30%; margin: 50px;">
+      <label for="saveAmount" class="form-label">Amount To Save</label>
+      <input type="number" class="form-control" id="saveAmount">
+    </div>
+    <div class="mb-3" style="width: 30%; margin: 50px;">
+        <label for="startDate" class="form-label">Start Date (yyyy-mm-dd)</label>
+        <input type="text" class="form-control" id="startDate">
+        <div id="start" class="form-text">When do you want to start saving?</div>
+    </div>
+    <div class="mb-3" style="width: 30%; margin: 50px;">
+        <label for="endDate" class="form-label">End Date (yyyy-mm-dd)</label>
+        <input type="text" class="form-control" id="endDate">
+        <div id="end" class="form-text">When do you want to stop saving?</div>
+    </div>
+    <button type="submit" class="btn btn-primary" style="width: 30%; margin: 50px;">Submit</button>
+  </form>
+{% endblock %}
