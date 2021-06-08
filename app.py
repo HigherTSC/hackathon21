@@ -1,6 +1,7 @@
 from flask import Flask, render_template, Response
 from main import GoalHandler, Goal#
-import datetime, time
+from datetime import datetime
+import time
 
 # Create dummy dataset
 goalhandler = GoalHandler()

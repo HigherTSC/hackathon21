@@ -14,7 +14,7 @@ class GoalHandler():
         amount_saved = 0
         isComplete = False
 
-        self.goals[name] = Goal(start_date, end_date, name, amount_to_save, daily_pledge, days, isComplete)
+        self.goals[name] = Goal(start_date, end_date, name, amount_saved, amount_to_save, daily_pledge, days, isComplete)
     
     def check_goal(self, name):
         current_goal = self.goals[name]
