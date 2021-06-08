@@ -1,5 +1,19 @@
 from flask import Flask, render_template, Response
-import time
+from main import GoalHandler, Goal#
+import datetime, time
+
+# Create dummy dataset
+goalhandler = GoalHandler()
+goalhandler.store_new_goal(
+	start_date=datetime.strptime('2020-06-07', "%Y-%m-%d"),
+	end_date=datetime.strptime('2020-06-30', "%Y-%m-%d"),
+	name="Birthday Present",
+	amount_to_save=100)
+goalhandler.store_new_goal(
+	start_date=datetime.strptime('2020-06-07', "%Y-%m-%d"),
+	end_date=datetime.strptime('2020-12-15', "%Y-%m-%d"),
+	name="New Laptop",
+	amount_to_save=1000)
 
 app = Flask(__name__)
 
@@ -11,7 +25,7 @@ def index():
 def progress1():
 	def generate():
 		x = 0
-
+		
 		#for x in range(0,100):
 		while x < 101:
 			yield "data:" + str(x) + "\n\n"
