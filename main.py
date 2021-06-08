@@ -1,112 +1,106 @@
-from datetime import datetime
-from datetime import date
+from datetime import datetime, date
 import time
 
-#DATE DATASET
-start_date_input1 = '2020-06-07'
-start_date1 = datetime.strptime(start_date_input1, "%Y-%m-%d")
-end_date_input1 = '2020-06-30'
-end_date1 = datetime.strptime(end_date_input1, "%Y-%m-%d")
-start_date_input2 = '2020-06-07'
-start_date2 = datetime.strptime(start_date_input2, "%Y-%m-%d")
-end_date_input2 = '2020-12-15'
-end_date2 = datetime.strptime(end_date_input2, "%Y-%m-%d")
+class GoalHandler():
+    def __init__(self):
+        self.goals={}
+        self.today = date.today()
 
-today = date.today()
-goal_list = {}
-def store_new_goal(start_date, end_date, name, amount_to_save):
+    def store_new_goal(self, start_date, end_date, name, amount_to_save):
+        days_saving = (end_date - start_date).days
+        daily_pledge = amount_to_save/days_saving
+        daily_pledge = round(daily_pledge, 2)
+        days = 0
+        amount_saved = 0
+        isComplete = False
 
-    #calculate daily pledge:
-    days_saving = (end_date - start_date).days
-    daily_pledge = amount_to_save/days_saving
-    daily_pledge = round(daily_pledge, 2)
-    days = 0
-    amount_saved = 0
-    isComplete = False
+        self.goals[name] = Goal(start_date, end_date, name, amount_saved, amount_to_save, daily_pledge, days, isComplete)
+    
+    def check_goal(self, name):
+        current_goal = self.goals[name]
+        if current_goal.isComplete == False:
+            return f"The goal has not been complete yet. You have saved {current_goal.amount_saved} of {current_goal.amount_to_save} so far for a {name}."
+        else:
+            return f"Congrats! You successfully saved up {current_goal.amount_to_save} for a {name}."
 
-    #update goal list:
-    goal_list.update({name: [start_date, end_date, amount_saved, amount_to_save, daily_pledge, days, isComplete]})
+    def add_to_goal(self, name, deposit):
+        current_goal = self.goals[name]
+        new_amount_saved = current_goal.amount_saved + deposit
+        if current_goal.isComplete == True:
+            message = "That goal is already complete, you can't add to it!"
+        if new_amount_saved > current_goal.amount_to_save:
+            message = f"Only {current_goal.amount_to_save} was added. You have now reached the goal! Go enjoy your {name}!"
+            # i can't remember if python objects update inplace or not, so i wrote it out like this to be safe
+            self.goals[name].isComplete = True
+        elif new_amount_saved == current_goal.amount_to_save:
+            message = f"{current_goal.amount_to_save} was added. You have now reached the goal! Go enjoy your {name}!"
+            self.goals[name].isComplete = True
+        else:
+            self.goals[name].amount_saved += deposit # update amount saved
+            days_saving = (current_goal.end_date - current_goal.start_date).days
+            remaining_days = days_saving - current_goal.days
+            self.goals[name].daily_pledge = (current_goal.amount_to_save - current_goal.amount_saved)/remaining_days
+            message = f"{deposit} was added. You now have {current_goal.amount_to_save} left to save for your {name}."
+        return message
 
-#goal_list[0]-->startdate
-#goal_list[1]-->enddate
-#goal_list[2]-->amountsaved
-#goal_list[3]-->amounttosave
-#goal_list[4]-->dailypledge
-#goal_list[5]-->days
-#goal_list[6]-->siComplete
+    def get_goal(self, name):
+        if name in self.goals.keys():
+            return self.goals[name]
+        else:
+            return ValueError
+    
+    def get_goal_streak(self, name):
+        if name in self.goals.keys():
+            return today - self.goals[name].start_date
+        else:
+            return ValueError
 
-def check_goal(name):
-    global goal_list
-    if goal_list[name][6] == False:
-        return False
-    else:
-        #send acheivement
-        print('Congrats! You successfully saved up ',goal_list[name][3],' for a ',name,'.')
-        return True
+    def get_max_streak(self):
+        all_streak = []
+        for name in self.goals.keys():
+            all_streak.append(self.get_goal_streak(name))
+        return max(all_streak)
 
-def add_to_goal(name, deposit):
-    global goal_list
-    if (goal_list[name][2] + deposit) > goal_list[name][3]:
-        return ValueError
-    elif (goal_list[name][2] + deposit) == goal_list[name][3]:
-        goal_list[name][6] = True
-    else:
-        goal_list[name][2] += deposit        #update amount saved
-        days_saving = (goal_list[name][1] - goal_list[name][0]).days
-        #alternatively, reaminingdays = (end date - today).days
-        remaining_days = days_saving - goal_list[name][5]
-        #update daily pledge
-        goal_list[name][4] = (goal_list[name][3] - goal_list[name][2])/remaining_days
-################MILESTONES##########################
+    def clean_list(self):
+        for name in self.goals.keys():
+            if self.goals[name].isComplete == True:
+                self.goals.pop(name)
 
-#milestone feature
-#assume 3 basic milestones
-savings = 1000
-start_savings = savings
-milestones = ["Yay! You unlocked the first milestone \nfor making your first savings: FIRST SAVE!\n",
-              "YOU'RE ON A ROLL! You unlocked the second milestone \nfor doubling your savings: DOUBLE TROUBLE!\n",
-              "WOW! You're practically a savings veteran \nfor getting the last milestone: 100,000 MILESTONE!\n"]
 
-def check_milestones(savings):
-    if savings > start_savings:
-        #get acheivement
-        print(milestones[0])
-    elif savings >= 2*start_savings:
-        #get acheivement
-        print(milestones[1])
-    elif savings >= 100000:
-        #get acheivement
-        print(milestones[2])
+class Goal():
+    def __init__(self, start_date, end_date, name, amount_saved, amount_to_save, daily_pledge, days, isComplete):
+        self.start_date = start_date
+        self.end_date = end_date
+        self.name = name
+        self.amount_saved = amount_saved
+        self.amount_to_save = amount_to_save
+        self.daily_pledge = daily_pledge
+        self.days = days
+        self.isComplete = isComplete
 
-########STREAKS####################################
+class MilestoneHandler():
+    def __init__(self, start_savings=1000):
+        self.start_savings = start_savings
+        # initialise with 3 basic milestones
+        self.milestones = {"first_save": "Yay! You unlocked the first milestone for making your first savings: FIRST SAVE!",
+                            "double_savings": "YOU'RE ON A ROLL! You unlocked the second milestone for doubling your savings: DOUBLE TROUBLE!",
+                            "savings_veteran":"WOW! You're practically a savings veteran for getting the last milestone: 100,000 MILESTONE!"}
+    
+    def new_milestone(self, milestone_name, milestone_text):
+        self.milestones[milestone_name] = milestone_text
 
-#streak = get_goal_streak//get_max_streak
-#SIMPLY DISPLAY THIS VALUE AS THE STREAK
-def get_goal_streak(name):
-    global goal_list
-    current_streak = today - goal_list[name][0]
-    return current_streak
-
-def get_max_streak():
-    global goal_list
-    all_streak = []
-    for name in goal_list.keys():
-        all_streak.append((today - goal_list[name][0]).days)
-    return max(all_streak)
-
-#################MAINLOOP FOR PROGRESS BARS##################
-
-for name in goal_list.keys():
-    if (goal_list[name][2]) >= goal_list[name][3]:
-        goal_list[name][6] = True
-        savings += goal_list[name][2]
-        goal_list.pop(name)
-    else:
-        days_saving = (goal_list[name][1] - goal_list[name][0]).days
-        for x in range(0, days_saving + 1):
-            goal_list[name][2] += goal_list[name][4]
-            if (goal_list[name][2]) >= goal_list[name][3]:
-                goal_list[name][6] = True
-                savings += goal_list[name][2]
-                goal_list.pop(name)
-            time.sleep(86400)#loops every 24 hours
+    def check_milestones(self, savings):
+        current_milestones = []
+        if savings > start_savings:
+            #get acheivement
+            current_milestones.append(self.milestones["first_save"])
+        if savings >= 2*start_savings:
+            #get acheivement
+            current_milestones.append(self.milestones["double_savings"])
+        if savings >= 100000:
+            #get acheivement
+            current_milestones.append(self.milestones["savings_veteran"])
+        if len(current_milestones) == 0:
+            return ["No milestones achieved right now."]
+        else:
+            return current_milestones
